@@ -1,42 +1,34 @@
-import React, {Component} from 'react';
+import React, {useReducer} from 'react';
 import QuizQuestion from './QuizQuestion.js'
 import QuizEnd from './QuizEnd'
 
 let quizData = require('./quiz_data.json')
 
-class Quiz extends Component {
+const Quiz = () => {
 
-    constructor(props){
-        super(props);
-        this.state = {
-            quiz_position: 1
+    const initialState = { quizPostion: 1}
+
+    const reducer = (state, action) => {
+        switch (action.type){
+            case "next":
+                return {quizPostion: state.quizPostion + 1};
+            case "reset":
+                return {quizPostion: 1};
         }
     }
 
-    showNextQuestion() {
-        this.setState({
-            quiz_position: this.state.quiz_position+1
-        })
-    }
+    const [state, dispatch] = useReducer(reducer, initialState);
 
-    handleResetClick () {
-        this.setState({
-            quiz_position: 1
-        })
-    }
-
-    render() {
-    const isQuizEnd = this.state.quiz_position-1 === quizData.quiz_questions.length  ;
+    const isQuizEnd = state.quizPostion - 1 === quizData.quiz_questions.length  ;
 
     return (
     <div>
         { isQuizEnd
-         ? <QuizEnd resetClickHandler={this.handleResetClick.bind(this)}/>
-        :<QuizQuestion showNextQuestionHandler={this.showNextQuestion.bind(this)} quiz_question={quizData.quiz_questions[this.state.quiz_position-1]}/>
+         ? <QuizEnd resetClickHandler={() => dispatch({type: "reset"})}/>
+        :<QuizQuestion showNextQuestionHandler={() => dispatch({type: "next"})} quiz_question={quizData.quiz_questions[state.quizPostion - 1]}/>
         }
     </div>
     )
-    }
 }
 
 export default Quiz;
